@@ -1,0 +1,17 @@
+{
+    "name": "codecycler/passport-plugin",
+    "description": "Passport plugin for October CMS",
+    "type": "october-plugin",
+    "authors": [
+        {
+            "name": "Sebastiaan Kloos",
+            "email": "sebastiaan@codecycler.com"
+        }
+    ],
+    "require": {
+        "laravel/passport": "8.*",
+        "lcobucci/jwt": "3.3.3",
+        "codecycler/oc-extend-plugin": "dev-main",
+        "rainlab/user-plugin": "dev-master"
+    }
+}

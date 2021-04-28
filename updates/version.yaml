@@ -1,0 +1,9 @@
+1.0.1: First version of Passport
+1.0.2:
+    - Added tables for passport
+    - create_oauth_access_tokens_table.php
+    - create_oauth_auth_codes_table.php
+    - create_oauth_clients_table.php
+    - create_oauth_personal_access_clients_table.php
+    - create_oauth_refresh_tokens_table.php
+    - create_password_resets_table.php
