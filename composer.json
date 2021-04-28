@@ -12,6 +12,6 @@
         "laravel/passport": "8.*",
         "lcobucci/jwt": "3.3.3",
         "codecycler/oc-extend-plugin": "dev-main",
-        "rainlab/user-plugin": "dev-master"
+        "rainlab/user-plugin": "^v1.5.4"
     }
 }
