@@ -3,14 +3,11 @@
 use App;
 use Event;
 use Config;
-use Backend;
 use Laravel\Passport\Passport;
 use System\Classes\PluginBase;
-use RainLab\User\Facades\Auth;
 use Illuminate\Foundation\AliasLoader;
 use Codecycler\Passport\Classes\Authenticate;
 use Codecycler\Passport\Classes\Extend\RainLab\User\User;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 
 /**
  * Passport Plugin Information File

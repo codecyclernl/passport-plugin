@@ -50,7 +50,7 @@
 
                     'api' => [
                         'driver' => 'passport',
-                        'provider' => 'users',
+                        'provider' => 'frontend',
                     ],
                 ],
 
@@ -72,7 +72,7 @@
                 */
 
                 'providers' => [
-                    'users' => [
+                    'frontend' => [
                         'driver' => 'eloquent',
                         'model' => \RainLab\User\Models\User::class,
                     ],
