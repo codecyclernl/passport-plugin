@@ -5,7 +5,6 @@ use Event;
 use Config;
 use Laravel\Passport\Passport;
 use System\Classes\PluginBase;
-use Illuminate\Foundation\AliasLoader;
 use Codecycler\Passport\Classes\Authenticate;
 use Codecycler\Passport\Classes\Extend\RainLab\User\User;
 
@@ -47,59 +46,36 @@ class Plugin extends PluginBase
      */
     public function boot()
     {
-        $this->bootPackages();
+        $this->registerConfig();
+        $this->registerProviders();
+        $this->registerAliases();
+        $this->registerMiddleware();
 
-        Event::subscribe(User::class);
-
-        // Boot middleware aliases
-        $this->aliasMiddleware();
-
+        //
         Passport::ignoreMigrations();
 
-        Passport::routes();
+        //
+        Event::subscribe(User::class);
     }
 
-    /**
-     * Boots (configures and registers) any packages found within this plugin's packages.load configuration value
-     *
-     * @see https://luketowers.ca/blog/how-to-use-laravel-packages-in-october-plugins
-     * @author Luke Towers <octobercms@luketowers.ca>
-     */
-    public function bootPackages()
+    protected function registerProviders()
     {
-        // Get the namespace of the current plugin to use in accessing the Config of the plugin
-        $pluginNamespace = str_replace('\\', '.', strtolower(__NAMESPACE__));
-
-        // Instantiate the AliasLoader for any aliases that will be loaded
-        $aliasLoader = AliasLoader::getInstance();
-
-        // Get the packages to boot
-        $packages = Config::get($pluginNamespace . '::packages');
-
-        // Boot each package
-        foreach ($packages as $name => $options) {
-            // Setup the configuration for the package, pulling from this plugin's config
-            if (!empty($options['config']) && !empty($options['config_namespace'])) {
-                Config::set($options['config_namespace'], $options['config']);
-            }
-
-            // Register any Service Providers for the package
-            if (!empty($options['providers'])) {
-                foreach ($options['providers'] as $provider) {
-                    App::register($provider);
-                }
-            }
-
-            // Register any Aliases for the package
-            if (!empty($options['aliases'])) {
-                foreach ($options['aliases'] as $alias => $path) {
-                    $aliasLoader->alias($alias, $path);
-                }
-            }
-        }
+        App::register('\Illuminate\Auth\AuthServiceProvider');
+        App::register('\Laravel\Passport\PassportServiceProvider');
     }
 
-    protected function aliasMiddleware()
+    public function registerAliases()
+    {
+        App::registerClassAlias('Passport', '\Laravel\Passport\Passport');
+    }
+
+    protected function registerConfig()
+    {
+        Config::set('auth', Config::get('codecycler.passport::auth'));
+        Config::set('laravel-passport', Config::get('codecycler.passport::passport'));
+    }
+
+    protected function registerMiddleware()
     {
         $router = $this->app['router'];
 
