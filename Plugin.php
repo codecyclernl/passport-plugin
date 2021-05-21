@@ -5,7 +5,9 @@ use Event;
 use Config;
 use Laravel\Passport\Passport;
 use System\Classes\PluginBase;
+use RainLab\User\Models\UserGroup;
 use Codecycler\Passport\Classes\Authenticate;
+use Laravel\Passport\Http\Middleware\CheckScopes;
 use Codecycler\Passport\Classes\Extend\RainLab\User\User;
 
 /**
@@ -14,7 +16,8 @@ use Codecycler\Passport\Classes\Extend\RainLab\User\User;
 class Plugin extends PluginBase
 {
     public $middlewareAliases = [
-        'auth' => Authenticate::class
+        'auth' => Authenticate::class,
+        'scopes' => CheckScopes::class,
     ];
 
     /**
@@ -35,8 +38,8 @@ class Plugin extends PluginBase
     public function register()
     {
         $this->app->bind('Illuminate\Contracts\Auth\Factory', function () {
-            return app()['auth'];
-        });
+            return $this->app['auth'];
+        }, true);
     }
 
     /**
@@ -55,18 +58,30 @@ class Plugin extends PluginBase
         Passport::ignoreMigrations();
 
         //
+        $scopes = [];
+
+        $groups = UserGroup::all();
+
+        foreach ($groups as $group) {
+            $scopes['group-' . $group->code] = 'Group' . $group->name;
+        }
+
+        //
+        Passport::tokensCan($scopes);
+
+        //
         Event::subscribe(User::class);
     }
 
     protected function registerProviders()
     {
-        App::register('\Illuminate\Auth\AuthServiceProvider');
         App::register('\Laravel\Passport\PassportServiceProvider');
+        App::register('\Illuminate\Auth\AuthServiceProvider');
     }
 
     public function registerAliases()
     {
-        App::registerClassAlias('Passport', '\Laravel\Passport\Passport');
+        //App::registerClassAlias('Passport', '\Laravel\Passport\Passport');
     }
 
     protected function registerConfig()

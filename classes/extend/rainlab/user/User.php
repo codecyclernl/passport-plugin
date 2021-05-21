@@ -23,6 +23,19 @@ class User extends PluginExtender
             $implements = $model->implements;
             $implements[] = HasApiTokens::class;
             $model->implement = $implements;
+
+            $model->addDynamicMethod('can', function ($scope) use ($model) {
+                $groups = $model->groups()
+                    ->pluck('code')
+                    ->toArray();
+
+                if (str_contains($scope, 'group-')) {
+                    // Check if user is in the group
+                    return in_array(str_replace('group-', '', $scope), $groups, true);
+                }
+
+                return false;
+            });
         });
     }
 }
