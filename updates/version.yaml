@@ -13,3 +13,5 @@
 1.0.4:
     - 'Updated table codecycler_passport_one_time_passwords'
     - builder_table_update_codecycler_passport_one_time_passwords.php
+1.1.0:
+    - Added support for OTPs and automatic login links
