@@ -1,14 +1,15 @@
 <?php namespace Codecycler\Passport\Models;
 
 use Model;
-use October\Rain\Database\Traits\Encryptable;
+use Carbon\Carbon;
+use October\Rain\Database\Traits\SoftDelete;
 
 /**
  * OneTimePassword Model
  */
 class OneTimePassword extends Model
 {
-    use Encryptable;
+    use SoftDelete;
     use \October\Rain\Database\Traits\Validation;
 
     /**
@@ -51,10 +52,6 @@ class OneTimePassword extends Model
      */
     protected $hidden = [];
 
-    public $encryptable = [
-        'token',
-    ];
-
     /**
      * @var array dates attributes that should be mutated to dates
      */
@@ -76,4 +73,10 @@ class OneTimePassword extends Model
     public $morphMany = [];
     public $attachOne = [];
     public $attachMany = [];
+
+    public function scopeActive($query)
+    {
+        $now = Carbon::now();
+        $query->where('expired_at', '>=', $now);
+    }
 }
