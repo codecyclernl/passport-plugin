@@ -38,6 +38,10 @@ class Authenticate
             return response()->json(['error' => 'Unauthenticated!'], 401);
         }
 
+        if ($request->user()) {
+            auth()->loginUsingId($request->user()->id);
+        }
+
         return $next($request);
     }
 

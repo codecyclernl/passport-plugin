@@ -6,7 +6,9 @@ use Config;
 use Laravel\Passport\Passport;
 use System\Classes\PluginBase;
 use RainLab\User\Models\UserGroup;
+use RainLab\User\Classes\AuthManager;
 use Codecycler\Passport\Classes\Authenticate;
+use Backend\Classes\AuthManager as BackendAuth;
 use Laravel\Passport\Http\Middleware\CheckScopes;
 use Codecycler\Passport\Classes\Extend\RainLab\User\User;
 
@@ -37,9 +39,6 @@ class Plugin extends PluginBase
 
     public function register()
     {
-        $this->app->bind('Illuminate\Contracts\Auth\Factory', function () {
-            return $this->app['auth'];
-        }, true);
     }
 
     /**
@@ -49,6 +48,18 @@ class Plugin extends PluginBase
      */
     public function boot()
     {
+        if(App::runningInBackend()) {
+            // Register backend auth if not already
+            $authManager = BackendAuth::instance();
+        } else {
+            // Register frontend auth
+            $authManager = AuthManager::instance();
+        }
+
+        $this->app->bind('Illuminate\Contracts\Auth\Factory', function () use ($authManager) {
+            return $authManager;
+        });
+
         $this->registerConfig();
         $this->registerProviders();
         $this->registerAliases();
