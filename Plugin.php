@@ -74,7 +74,7 @@ class Plugin extends PluginBase
         $groups = UserGroup::all();
 
         foreach ($groups as $group) {
-            $scopes['group-' . $group->code] = 'Group' . $group->name;
+            $scopes['group-' . $group->code] = 'Group ' . $group->name;
         }
 
         //

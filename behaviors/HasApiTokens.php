@@ -37,7 +37,7 @@ class HasApiTokens extends ExtensionBase
 
     public function tokenCan($scope)
     {
-        return $this->accessToken ? $this->parent->can($scope) : false;
+        return $this->parent->can($scope);
     }
 
     public function createToken($name, array $scopes = [])

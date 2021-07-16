@@ -31,7 +31,7 @@ class User extends PluginExtender
 
                 if (str_contains($scope, 'group-')) {
                     // Check if user is in the group
-                    return in_array(str_replace('group-', '', $scope), $groups, true);
+                    return in_array(str_replace('group-', '', $scope), $groups);
                 }
 
                 return false;
