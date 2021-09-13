@@ -77,6 +77,6 @@ class OneTimePassword extends Model
     public function scopeActive($query)
     {
         $now = Carbon::now();
-        $query->where('expired_at', '>=', $now);
+        $query->where('expired_at', '>=', $now)->orWhereNull('expired_at');
     }
 }
