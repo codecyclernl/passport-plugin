@@ -1,0 +1,18 @@
+columns:
+  name:
+    label: Name
+    sortable: true
+    searchable: true
+  last_used:
+    label: 'Last used'
+    sortable: true
+    searchable: true
+  revoked:
+    label: Revoked
+    sortable: true
+    type: switch
+  expires_at:
+    label: 'Expires at'
+    type: datetime
+    sortable: true
+    searchable: true

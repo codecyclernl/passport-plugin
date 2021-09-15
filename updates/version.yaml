@@ -15,3 +15,6 @@
     - builder_table_update_codecycler_passport_one_time_passwords.php
 1.1.0:
     - Added support for OTPs and automatic login links
+1.2.0:
+    - Added last used to personal access tokens
+    - update_oauth_access_tokens_table_add_last_used.php

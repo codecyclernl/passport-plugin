@@ -1,0 +1,9 @@
+fields:
+  name:
+    label: Name
+    span: left
+    type: text
+  revoked:
+    label: Revoked
+    span: left
+    type: checkbox

@@ -1,6 +1,7 @@
 <?php namespace Codecycler\Passport\Classes;
 
 use Closure;
+use Codecycler\Passport\Models\Token;
 use Illuminate\Auth\AuthenticationException;
 
 class Authenticate

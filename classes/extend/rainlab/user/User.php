@@ -1,9 +1,12 @@
 <?php namespace Codecycler\Passport\Classes\Extend\RainLab\User;
 
+use Laravel\Passport\Client;
 use RainLab\User\Controllers\Users;
+use Illuminate\Container\Container;
+use Codecycler\Passport\Models\Token;
 use RainLab\User\Models\User as UserModel;
 use Codecycler\Extend\Classes\PluginExtender;
-use Codecycler\Passport\Behaviors\HasApiTokens;
+use Laravel\Passport\PersonalAccessTokenFactory;
 
 class User extends PluginExtender
 {
@@ -17,25 +20,106 @@ class User extends PluginExtender
         return Users::class;
     }
 
-    public function extendSubscribe()
+    public function hasMany()
     {
-        UserModel::extend(function ($model) {
-            $implements = $model->implements;
-            $implements[] = HasApiTokens::class;
-            $model->implement = $implements;
+        return [
+            'clients' => [
+                Client::class,
+                'key' => 'user_id',
+            ],
+            'tokens' => [
+                Token::class,
+                'key' => 'user_id',
+            ],
+        ];
+    }
 
-            $model->addDynamicMethod('can', function ($scope) use ($model) {
-                $groups = $model->groups()
-                    ->pluck('code')
-                    ->toArray();
+    public function methods()
+    {
+        return [
+            'can' => [$this, 'can'],
+            'token' => [$this, 'token'],
+            'order' => [$this, 'orderBy'],
+            'tokenCan' => [$this, 'tokenCan'],
+            'scopeOrder' => [$this, 'orderBy'],
+            'createToken' => [$this, 'createToken'],
+            'withAccessToken' => [$this, 'withAccessToken'],
+        ];
+    }
 
-                if (str_contains($scope, 'group-')) {
-                    // Check if user is in the group
-                    return in_array(str_replace('group-', '', $scope), $groups);
-                }
+    public function addTabFields()
+    {
+        return [
+            'tokens' => [
+                'label' => '',
+                'tab' => 'Tokens',
+                'type' => 'partial',
+                'path' => '$/codecycler/passport/partials/tab_tokens.htm',
+            ],
+        ];
+    }
 
-                return false;
-            });
-        });
+    public function addRelationConfig()
+    {
+        return [
+            'tokens' => [
+                'label' => 'token',
+                'manage' => [
+                    'form' => '$/codecycler/passport/models/token/fields.yaml',
+                ],
+                'view' => [
+                    'showSearch' => true,
+                    'list' => '$/codecycler/passport/models/token/columns.yaml',
+                    'toolbarButtons' => 'delete',
+                    'recordsPerPage' => 10,
+                ],
+            ],
+        ];
+    }
+
+    public function orderBy($query)
+    {
+        $query->orderBy('created_at', 'desc');
+    }
+
+    public function token()
+    {
+        return $this->modelObj->accessToken;
+    }
+
+    public function tokenCan($scope)
+    {
+        return $this->modelObj->can($scope);
+    }
+
+    public function createToken($name, $scopes)
+    {
+        return Container::getInstance()->make(PersonalAccessTokenFactory::class)->make(
+            $this->modelObj->getKey(), $name, $scopes
+        );
+    }
+
+    public function withAccessToken($accessToken)
+    {
+        $this->modelObj->accessToken = $accessToken;
+
+        $accessToken->last_used = \Carbon\Carbon::now();
+        $accessToken->save();
+
+        return $this->modelObj;
+    }
+
+    public function can($scope)
+    {
+        $groups = $this->modelObj->groups()
+            ->pluck('code')
+            ->toArray();
+
+        if (str_contains($scope, 'group-')) {
+            // Check if user is in the group
+            return in_array(str_replace('group-', '', $scope), $groups);
+        }
+
+        return false;
     }
 }
