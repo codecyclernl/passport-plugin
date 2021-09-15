@@ -34,6 +34,13 @@ class User extends PluginExtender
         ];
     }
 
+    public function properties()
+    {
+        return [
+            'accessToken' => [$this, 'accessToken'],
+        ];
+    }
+
     public function methods()
     {
         return [
@@ -97,6 +104,11 @@ class User extends PluginExtender
         return Container::getInstance()->make(PersonalAccessTokenFactory::class)->make(
             $this->modelObj->getKey(), $name, $scopes
         );
+    }
+
+    public function accessToken()
+    {
+        return null;
     }
 
     public function withAccessToken($accessToken)
