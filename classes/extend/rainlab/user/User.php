@@ -99,7 +99,7 @@ class User extends PluginExtender
         return $this->modelObj->can($scope);
     }
 
-    public function createToken($name, $scopes)
+    public function createToken($name, array $scopes = [])
     {
         return Container::getInstance()->make(PersonalAccessTokenFactory::class)->make(
             $this->modelObj->getKey(), $name, $scopes
