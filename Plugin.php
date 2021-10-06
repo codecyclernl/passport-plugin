@@ -5,8 +5,10 @@ use Event;
 use Config;
 use Laravel\Passport\Passport;
 use System\Classes\PluginBase;
+use System\Classes\PluginManager;
 use RainLab\User\Models\UserGroup;
 use RainLab\User\Classes\AuthManager;
+use Illuminate\Support\Facades\Schema;
 use Codecycler\Passport\Classes\Authenticate;
 use Backend\Classes\AuthManager as BackendAuth;
 use Laravel\Passport\Http\Middleware\CheckScopes;
@@ -52,40 +54,42 @@ class Plugin extends PluginBase
      */
     public function boot()
     {
-        if(App::runningInBackend()) {
-            // Register backend auth if not already
-            $authManager = BackendAuth::instance();
-        } else {
-            // Register frontend auth
-            $authManager = AuthManager::instance();
+        if (Schema::hasTable('user_groups')) {
+            if(App::runningInBackend()) {
+                // Register backend auth if not already
+                $authManager = BackendAuth::instance();
+            } else {
+                // Register frontend auth
+                $authManager = AuthManager::instance();
+            }
+
+            $this->app->bind('Illuminate\Contracts\Auth\Factory', function () use ($authManager) {
+                return $authManager;
+            });
+
+            $this->registerConfig();
+            $this->registerProviders();
+            $this->registerAliases();
+            $this->registerMiddleware();
+
+            //
+            Passport::ignoreMigrations();
+
+            //
+            $scopes = [];
+
+            $groups = UserGroup::all();
+
+            foreach ($groups as $group) {
+                $scopes['group-' . $group->code] = 'Group ' . $group->name;
+            }
+
+            //
+            Passport::tokensCan($scopes);
+
+            //
+            Event::subscribe(User::class);
         }
-
-        $this->app->bind('Illuminate\Contracts\Auth\Factory', function () use ($authManager) {
-            return $authManager;
-        });
-
-        $this->registerConfig();
-        $this->registerProviders();
-        $this->registerAliases();
-        $this->registerMiddleware();
-
-        //
-        Passport::ignoreMigrations();
-
-        //
-        $scopes = [];
-
-        $groups = UserGroup::all();
-
-        foreach ($groups as $group) {
-            $scopes['group-' . $group->code] = 'Group ' . $group->name;
-        }
-
-        //
-        Passport::tokensCan($scopes);
-
-        //
-        Event::subscribe(User::class);
     }
 
     protected function registerProviders()
