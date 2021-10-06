@@ -17,6 +17,10 @@ use Codecycler\Passport\Classes\Extend\RainLab\User\User;
  */
 class Plugin extends PluginBase
 {
+    public $require = [
+        'RainLab.User',
+    ];
+
     public $middlewareAliases = [
         'auth' => Authenticate::class,
         'scopes' => CheckScopes::class,
