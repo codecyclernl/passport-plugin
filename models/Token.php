@@ -76,6 +76,7 @@ class Token extends Model
         'expires_at',
         'created_at',
         'updated_at',
+        'last_used',
     ];
 
     public $belongsTo = [
